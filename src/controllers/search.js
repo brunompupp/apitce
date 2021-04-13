@@ -1,7 +1,7 @@
 require('dotenv').config();
 const elasticsearch = require('elasticsearch');
 const client = new elasticsearch.Client({
-  host: 'http://elastic:Infra2020@138.91.117.150:9201',
+  host: process.env.ELASTIC
 
 });
 
@@ -10,6 +10,14 @@ module.exports = {
   search(req,res){
 
     let {index, key, option_key} = req.body;
+
+    if(!index || index === '' || index === null || index === undefined){
+      return res.json({status:'erro', message: 'Defina o index para a busca'});
+    }
+    if(!key || key === '' || key === null || key === undefined){
+      return res.json({status:'erro', message: 'Defina uma key para busca'});
+    }
+    
     client.search({
       index:index,
       size: 10000,
