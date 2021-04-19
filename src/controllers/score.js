@@ -9,7 +9,16 @@ const client = new elasticsearch.Client({
 module.exports = {
   index(req, res) {
 
-    let { match, no_match, index } = req.query;
+    let { match, no_match, index, page, limit } = req.query;
+
+    if(!page || page ==="" || page === null || page === undefined){
+      page = 1
+    }
+    if(!limit || limit ==="" || limit === null || limit === undefined){
+      limit = 10
+    }
+    limit = Number(limit);
+    page = (Number(page) - 1) * limit;
 
     try {
       if (!index || index === '' || index === null || index === undefined) {
@@ -64,7 +73,8 @@ module.exports = {
 
       client.search({
         index: index,
-        size: 10000,
+        from: page,
+        size: limit,
         body: {
           "query": {
             "bool": {
@@ -98,18 +108,17 @@ module.exports = {
           const result = [];
 
 
-          newHits.map(item =>(
+          newHits.map(item => (
             result.push({
-              id:item._id,
-              score:item._score,
-              objeto:item._source.Objeto,
-              Natureza:item._source.Natureza,
-
+              id: item._id,
+              score: item._score,
+              objeto: item._source.Objeto,
+              Natureza: item._source.Natureza,
+              porcentagem: (Number(item._score) * 100) / Number(hits.max_score)
             })
           ))
 
-
-          return res.json({qtd_hits, max_score:hits.max_score, result })
+          return res.json({pages: Math.round(qtd_hits / limit), qtd_hits, max_score: hits.max_score, result })
 
         }
       })
