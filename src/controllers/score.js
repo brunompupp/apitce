@@ -70,7 +70,7 @@ module.exports = {
             "bool": {
               "must": [
                 {
-                  "term": {
+                  "match": {
                     "Objeto": match,
 
                   }
@@ -78,7 +78,7 @@ module.exports = {
               ],
               "must_not": [
                 {
-                  "term": {
+                  "match": {
                     "Objeto": no_match
                   }
                 }
@@ -93,7 +93,24 @@ module.exports = {
 
         } else {
           const { hits } = resp;
-          return res.json({ resultado: hits })
+          const qtd_hits = hits.total.value;
+          const newHits = hits.hits;
+          const result = [];
+
+
+          newHits.map(item =>(
+            result.push({
+              id:item._id,
+              score:item._score,
+              objeto:item._source.Objeto,
+              Natureza:item._source.Natureza,
+
+            })
+          ))
+
+
+          return res.json({qtd_hits, max_score:hits.max_score, result })
+
         }
       })
 
