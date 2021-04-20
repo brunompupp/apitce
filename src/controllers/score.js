@@ -15,8 +15,9 @@ module.exports = {
       page = 1
     }
     if(!limit || limit ==="" || limit === null || limit === undefined){
-      limit = 10
+      limit = 100
     }
+    
     limit = Number(limit);
     page = (Number(page) - 1) * limit;
 
@@ -36,27 +37,27 @@ module.exports = {
 
 
         body = {
-          "query": {
-            "bool": {
-              "must": [
-                {
-                  "term": {
-                    "Objeto": match,
-
+            "query": {
+              "bool": {
+                "must": [
+                  {
+                    "match": {
+                      "Objeto": match,
+  
+                    }
                   }
-                }
-              ],
-              "must_not": [
-                {
-                  "term": {
-                    "Objeto": no_match
+                ],
+                "must_not": [
+                  {
+                    "match": {
+                      "Objeto": no_match
+                    }
                   }
-                }
-              ]
-
+                ]
+  
+              }
             }
           }
-        }
 
 
       } else {
@@ -75,28 +76,7 @@ module.exports = {
         index: index,
         from: page,
         size: limit,
-        body: {
-          "query": {
-            "bool": {
-              "must": [
-                {
-                  "match": {
-                    "Objeto": match,
-
-                  }
-                }
-              ],
-              "must_not": [
-                {
-                  "match": {
-                    "Objeto": no_match
-                  }
-                }
-              ]
-
-            }
-          }
-        }
+        body: body
       }, function (err, resp, status) {
         if (err) {
           return res.json(err)
@@ -127,5 +107,54 @@ module.exports = {
     } catch (e) {
       return res.json({ status: 'erro', message: e.message })
     }
-  }
+  },
+
+
+  update(req,res){
+    let{id}= req.params;
+    let {field, value, index} = req.body;
+
+    if(!field || field === null || field === undefined || field === ''){
+      return res.json({status:'erro', message: 'Informe o field a ser atualizado.'})
+    }
+
+    if(!value || value === null || value === undefined || value === ''){
+      return res.json({status:'erro', message: 'Informe o valor do field a ser atualizado.'})
+    }
+    if(!index || index === null || index === undefined || index === ''){
+      return res.json({status:'erro', message: 'Informe o index a ser atualizado.'})
+    }
+
+    let objeto ={};
+
+    objeto[field] = value;
+
+
+    try {
+      client.update({
+        index: index,
+        id:id,
+        _source: `ctx.source.${field}.add(params.${field})`,
+        body:{
+          doc:objeto
+          
+        }
+      }, function(err, resp, status){
+        if(err){
+          return res.json({status: 'erro', message:err})
+        }else{
+          return res.json({status: 'sucesso'})
+        }
+      })
+    } catch (e) {
+      return res.json({status: 'erro', message: e.message})
+    }
+
+
+
+  },
+
+
+
+
 }

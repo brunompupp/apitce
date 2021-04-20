@@ -4,7 +4,7 @@ const routes = express.Router();
 
 routes.get('/', controller.index);
 // routes.post('/', controller.create);
-// routes.put('/', controller.update);
+routes.put('/:id', controller.update);
 
 
 module.exports = routes;
