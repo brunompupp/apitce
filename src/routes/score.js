@@ -3,7 +3,7 @@ const controller = require('../controllers/score');
 const routes = express.Router();
 
 routes.get('/', controller.index);
-// routes.post('/', controller.create);
+routes.get('/field', controller.verifyFields);
 routes.put('/:id', controller.update);
 
 
