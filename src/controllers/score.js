@@ -398,9 +398,9 @@ module.exports = {
                 field["id"] = item._id;
                 
                 let keys = item._source[keywords].split(',');
+
                 field[keywords] = keys;
                 
-                console.log(keys)
                 
                 result.push(field)
 
