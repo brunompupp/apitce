@@ -5,6 +5,7 @@ const routes = express.Router();
 routes.get('/', controller.index);
 routes.get('/listar', controller.listar);
 routes.post('/', controller.create);
+routes.post('/criar', controller.criar);
 routes.put('/', controller.update);
 routes.put('/atualizar', controller.atualizar);
 routes.delete('/', controller.delete);

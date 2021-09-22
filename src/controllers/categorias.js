@@ -77,6 +77,20 @@ async function atualizarTrue(ids) {
 }
 
 
+async function criarCategoria(idSql, nome, status){
+  let body = await client.index({
+    index: index,
+    body: {
+      "id": idSql,
+      "nome": nome,
+      "status": status,
+      "timestamp": moment().format()
+    }
+  })
+
+  return body
+}
+
 module.exports = {
   index(req, res) {
     try {
@@ -284,6 +298,36 @@ module.exports = {
       return res.json({status: 'sucesso', message: 'Categorias atualizadas com sucesso'})
     } catch (e) {
       return res.json({status: 'erro', message: e.message})
+    }
+  },
+  async criar(req,res){
+    let {idSql, nome, status} = req.body;
+    let message='';
+    try {
+      if(!idSql || idSql === null || idSql===undefined || idSql===''){
+        message+= 'Informe o id da categoria no Sql. '
+      }
+      if(!nome || nome === null || nome === undefined || nome ===''){
+        message += 'Informe o nome da categoria. '
+      }
+
+      if(message.length >0){
+        return res.json({status: 'erro', message: message})
+      }
+
+      if(!status || status === undefined || status === null || status === ''){
+        if(status === false){
+          status = false
+        }else{
+          status = true
+        }
+      }
+
+      let body = await criarCategoria(idSql, nome, status);
+
+      return res.json({status: 'sucesso', message: body})
+    } catch (e) {
+      return res.json({status: 'erro', message: e.message});
     }
   }
 
