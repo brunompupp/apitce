@@ -18,10 +18,13 @@ app.use(cors());
 const index = require('./routes/index');
 const search = require('./routes/search');
 const score = require('./routes/score');
+const categorias = require('./routes/categorias');
 
 app.use('/', index);
 app.use('/search', search);
 app.use('/score', score);
+app.use('/categorias', categorias);
+
 
 app.listen(porta, ()=>{
   console.log('api rodando')
