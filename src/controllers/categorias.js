@@ -291,6 +291,10 @@ module.exports = {
             status = true
 
           }
+        }else{
+          if(status !==false){
+            status = true
+          }
         }
         await atualizar(id, status);
       })
