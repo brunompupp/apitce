@@ -26,6 +26,7 @@ async function atualizar(id, status) {
 async function buscarCategorias() {
   let { hits } = await client.search({
     index,
+    size: 1000
   });
 
   return hits.hits
@@ -34,6 +35,7 @@ async function buscarCategorias() {
 async function buscarTodasCategorias() {
   let { hits } = await client.search({
     index,
+    size: 1000,
   });
 
   let dados = hits.hits;
@@ -43,14 +45,16 @@ async function buscarTodasCategorias() {
     let idElastic;
     let idSql;
     let nome;
+    let grupo;
     let status;
 
     idElastic = categoria._id;
     idSql = categoria._source.id;
     nome = categoria._source.nome;
     status = categoria._source.status;
+    grupo = categoria._source.grupo;
 
-    cat.push({ idElastic: idElastic, idSql: idSql, nome: nome, status: status })
+    cat.push({ idElastic: idElastic, idSql: idSql, nome: nome, status: status, grupo: grupo })
 
 
 
@@ -77,13 +81,14 @@ async function atualizarTrue(ids) {
 }
 
 
-async function criarCategoria(idSql, nome, status) {
+async function criarCategoria(idSql, nome, status, grupo) {
   let body = await client.index({
     index: index,
     body: {
-      "id": idSql,
+      "id": Number(idSql),
       "nome": nome,
       "status": status,
+      "grupo": grupo,
       "timestamp": moment().format()
     }
   })
@@ -95,6 +100,7 @@ async function criarCategoria(idSql, nome, status) {
 async function buscarCategoriasAtivas() {
   let {hits} = await client.search({
     index,
+    size: 1000,
     body: {
       'query': {
         'bool': {
@@ -124,13 +130,14 @@ async function buscarCategoriasAtivas() {
     let idElastic;
     let idSql;
     let nome;
-    let status;
+    let grupo;
 
     idElastic = categoria._id;
     idSql = categoria._source.id;
     nome = categoria._source.nome;
+    grupo = categoria._source.grupo;
 
-    cat.push({ idElastic: idElastic, idSql: idSql, nome: nome})
+    cat.push({ idElastic: idElastic, idSql: idSql, nome: nome, grupo: grupo})
 
 
   })
@@ -322,7 +329,7 @@ module.exports = {
     }
   },
   async criar(req, res) {
-    let { idSql, nome, status } = req.body;
+    let { idSql, nome, status, grupo } = req.body;
     let message = '';
     try {
       if (!idSql || idSql === null || idSql === undefined || idSql === '') {
@@ -330,6 +337,10 @@ module.exports = {
       }
       if (!nome || nome === null || nome === undefined || nome === '') {
         message += 'Informe o nome da categoria. '
+      }
+
+      if(!grupo || grupo === null || grupo === undefined || grupo === ''){
+        message += 'Informe o grupo da categoria. '
       }
 
       if (message.length > 0) {
@@ -344,7 +355,7 @@ module.exports = {
         }
       }
 
-      let body = await criarCategoria(idSql, nome, status);
+      let body = await criarCategoria(idSql, nome, status, grupo);
 
       return res.json({ status: 'sucesso', message: body })
     } catch (e) {
