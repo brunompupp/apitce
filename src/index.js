@@ -19,11 +19,13 @@ const index = require('./routes/index');
 const search = require('./routes/search');
 const score = require('./routes/score');
 const categorias = require('./routes/categorias');
+const frases = require('./routes/frases');
 
 app.use('/', index);
 app.use('/search', search);
 app.use('/score', score);
 app.use('/categorias', categorias);
+app.use('/frases', frases);
 
 
 app.listen(porta, ()=>{

@@ -1,16 +1,11 @@
-require('dotenv').config();
-const elasticsearch = require('elasticsearch');
+const {client, indexCategoria, indexObjeto} = require('../configs/elastic');
 const moment = require('moment');
-const client = new elasticsearch.Client({
-  host: process.env.ELASTIC
 
-});
-let index = 'categorias-tce'
 
 exports.getCategorias = () => {
   try {
     client.search({
-      index,
+      index: indexCategoria,
     }, function (err, resp, status) {
       if (err) {
         console.log(err)    

@@ -1,17 +1,11 @@
-require('dotenv').config();
-const elasticsearch = require('elasticsearch');
+const {client, indexCategoria} = require('../configs/elastic');
 const moment = require('moment');
-const client = new elasticsearch.Client({
-  host: process.env.ELASTIC
-
-});
 moment.locale('pt-br');
-let index = 'categorias-tce';
 
 async function atualizar(id, status) {
   console.log(id, status)
   let body = await client.update({
-    index,
+    index: indexCategoria,
     id: id,
     body: {
       doc: {
@@ -34,7 +28,7 @@ async function buscarCategorias() {
 
 async function buscarTodasCategorias() {
   let { hits } = await client.search({
-    index,
+    index: indexCategoria,
     size: 1000,
   });
 
@@ -83,7 +77,7 @@ async function atualizarTrue(ids) {
 
 async function criarCategoria(idSql, nome, status, grupo) {
   let body = await client.index({
-    index: index,
+    index: indexCategoria,
     body: {
       "id": Number(idSql),
       "nome": nome,
@@ -99,7 +93,7 @@ async function criarCategoria(idSql, nome, status, grupo) {
 
 async function buscarCategoriasAtivas() {
   let {hits} = await client.search({
-    index,
+    index: indexCategoria,
     size: 1000,
     body: {
       'query': {
@@ -162,7 +156,7 @@ module.exports = {
     let { nome } = req.body;
 
     client.search({
-      index,
+      index: indexCategoria,
     }, function (err, resp, status) {
       if (err) {
         console.log(err)
