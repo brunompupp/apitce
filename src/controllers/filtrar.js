@@ -172,5 +172,5 @@ module.exports = {
     } catch (e) {
       return res.json({ status: 'erro', message: e.message })
     }
-  }
+  },
 }

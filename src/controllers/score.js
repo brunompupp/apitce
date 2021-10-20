@@ -110,7 +110,7 @@ module.exports = {
   },
 
 
-  update(req, res) {
+  async update(req, res) {
     let { id } = req.params;
     let { field, value, index } = req.body;
 
@@ -125,27 +125,22 @@ module.exports = {
       return res.json({ status: 'erro', message: 'Informe o index a ser atualizado.' })
     }
 
+
     let objeto = {};
 
     objeto[field] = value;
 
 
     try {
-      client.update({
+      let resp = await client.update({
         index: index,
         id: id,
-        _source: `ctx.source.${field}.add(params.${field})`,
+        _sourceIncludes: [value],
         body: {
           doc: objeto
-
-        }
-      }, function (err, resp, status) {
-        if (err) {
-          return res.json({ status: 'erro', message: err })
-        } else {
-          return res.json({ status: 'sucesso' })
         }
       })
+      return res.json({ status: 'sucesso', resp })
     } catch (e) {
       return res.json({ status: 'erro', message: e.message })
     }
@@ -396,12 +391,12 @@ module.exports = {
               newHits.map(item => {
                 let field = {};
                 field["id"] = item._id;
-                
+
                 let keys = item._source[keywords].split(',');
 
                 field[keywords] = keys;
-                
-                
+
+
                 result.push(field)
 
               })
